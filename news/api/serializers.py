@@ -30,3 +30,16 @@ class EssaySerializer(serializers.Serializer):
         instance.up_date = validated_data.get('up_date', instance.up_date)
         instance.save() #This is for saving the data.
         return instance 
+    
+    #Custom Validation
+    def validate(self, data):
+        if data['title'] == data['body']:
+            raise serializers.ValidationError('Title and Body must be different from each other.')
+        return data
+    
+    #If we want to check for only one area, we can use this.
+    #This is called object level.
+    def validate_title(self, value):
+        if len(value) < 20:
+            raise serializers.ValidationError(f'Title must be at least 60 characters long. You entered {len(value)} characters.')
+        return value
