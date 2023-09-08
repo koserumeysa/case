@@ -1,6 +1,36 @@
 from rest_framework import serializers
 from news.models import Essay
 
+from datetime import datetime
+from django.utils.timesince import timesince
+
+class EssaySerializer(serializers.ModelSerializer):
+    time_since_pub = serializers.SerializerMethodField()
+    # print(time_since_pub)
+    class Meta:
+        model = Essay
+        fields = '__all__'
+        #If we want to include all fields, we can use this.
+        #If we want to show some fields, we can use this.
+        #fields =['author','title','body']
+        #If we want to exclude some fields, we can use this.
+        #exclude = ['id','isActive','cre_date','up_date','pub_date']
+        read_only_fields = ['id','up_date','cre_date']
+
+    def get_time_since_pub(self, object):
+        now = datetime.now()
+        pub_date = object.pub_date
+        time_delta = timesince(pub_date, now)
+        return time_delta
+    
+    def validate_pub_date(self, value):
+        if value > datetime.now().date():
+            raise serializers.ValidationError('Pub date cannot be in the future.')
+        return value
+
+
+
+#STANDARD SERIALIZER
 class EssaySerializer(serializers.Serializer):
     #This is for the id field.
     id = serializers.IntegerField(read_only=True)
