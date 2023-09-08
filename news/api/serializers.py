@@ -1,13 +1,18 @@
 from rest_framework import serializers
-from news.models import Essay
+from news.models import Essay, Reporter
 
 from datetime import datetime
 from django.utils.timesince import timesince
+
 
 class EssaySerializer(serializers.ModelSerializer):
     
     time_since_pub = serializers.SerializerMethodField()
     
+    #author = ReporterSerializer(read_only=True) #This means that do not anything with this in the backend.
+    #If we cannot use this, every author has an id.
+    #author = serializers.StringRelatedField() #This returns of the reporter.
+
     class Meta:
         model = Essay
         fields = '__all__'
@@ -33,6 +38,28 @@ class EssaySerializer(serializers.ModelSerializer):
         if value > datetime.now().date():
             raise serializers.ValidationError('Pub date cannot be in the future.')
         return value
+
+
+class ReporterSerializer(serializers.ModelSerializer):
+
+    #essays = EssaySerializer(many=True, read_only=True)
+    #When we use Hyperlinked then we can update the context in views.
+    essays = serializers.HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name='essay-detail'
+        )
+    
+    class Meta:
+        model = Reporter
+        fields = '__all__'
+
+
+
+
+
+
+
 
 
 

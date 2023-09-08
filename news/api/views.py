@@ -2,12 +2,35 @@ from rest_framework import status #request and response status
 from rest_framework.response import Response #redirect, render
 from rest_framework.decorators import api_view #decorator
 
-from news.models import Essay
-from news.api.serializers import EssaySerializer
+from news.models import Essay, Reporter
+from news.api.serializers import EssaySerializer, ReporterSerializer
 
 #class views
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
+
+class ReporterListCreateAPIView(APIView):
+    def get(self, request):
+        reporters = Reporter.objects.all()
+        #We should add context because we use HyperlinkedRelatedField.
+        serializer = ReporterSerializer(reporters, many=True, context={'request':request})
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = ReporterSerializer(data=request.data)
+        serializer.is_valid()
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request):
+        reporter = Reporter.objects.all()
+        reporter.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
 
 class EssayListCreateAPIView(APIView):
     def get(self, request):

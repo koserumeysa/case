@@ -1,8 +1,18 @@
 from django.db import models
 
+class Reporter(models.Model):
+    name = models.CharField(max_length=100)
+    surname = models.CharField(max_length=100)
+    bio = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.name} {self.surname}'
+    
+
 # Create your models here.
 class Essay(models.Model):
-    author = models.CharField(max_length=150)
+    #If we delete a reporter, all the essays of that reporter will be deleted.
+    author = models.ForeignKey(Reporter, on_delete=models.CASCADE, related_name='essays')
     title = models.CharField(max_length=150)
     body = models.TextField()
     isActive = models.BooleanField(default=True)
