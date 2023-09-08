@@ -6,7 +6,7 @@ class EssaySerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     author = serializers.CharField()
     title = serializers.CharField()
-    body = serializers.TextField()
+    body = serializers.CharField()
     isActive = serializers.BooleanField()
     cre_date = serializers.DateTimeField()
     up_date = serializers.DateTimeField()
