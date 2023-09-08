@@ -5,8 +5,9 @@ from datetime import datetime
 from django.utils.timesince import timesince
 
 class EssaySerializer(serializers.ModelSerializer):
+    
     time_since_pub = serializers.SerializerMethodField()
-    # print(time_since_pub)
+    
     class Meta:
         model = Essay
         fields = '__all__'
@@ -20,8 +21,13 @@ class EssaySerializer(serializers.ModelSerializer):
     def get_time_since_pub(self, object):
         now = datetime.now()
         pub_date = object.pub_date
-        time_delta = timesince(pub_date, now)
-        return time_delta
+        if object.isActive:
+            time_delta = timesince(pub_date, now)
+            return time_delta
+        else:
+            return 'Not Active'
+
+
     
     def validate_pub_date(self, value):
         if value > datetime.now().date():
@@ -31,7 +37,7 @@ class EssaySerializer(serializers.ModelSerializer):
 
 
 #STANDARD SERIALIZER
-class EssaySerializer(serializers.Serializer):
+class EssayDefaultSerializer(serializers.Serializer):
     #This is for the id field.
     id = serializers.IntegerField(read_only=True)
     author = serializers.CharField()
